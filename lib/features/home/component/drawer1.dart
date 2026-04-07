@@ -93,7 +93,7 @@ class Drawer1 extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const FavoritesScreen(),
+                            builder: (_) => const FavoriteScreen(),
                           ),
                         );
                       },

@@ -41,12 +41,15 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
+      appBar:AppBar(
         title: const Text(
-          "Upload Product",
+          "🛍️ Upload Product",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
