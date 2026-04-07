@@ -1,6 +1,6 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'dart:async';
-
+// api is .env file
 class ApiClient {
   final GenerativeModel _model;
 
