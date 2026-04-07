@@ -4,7 +4,7 @@ class FavoriteModel {
   final String image;
   final double price;
 
-  FavoriteModel({
+  const FavoriteModel({
     required this.id,
     required this.title,
     required this.image,
@@ -22,10 +22,45 @@ class FavoriteModel {
 
   factory FavoriteModel.fromMap(Map<String, dynamic> map) {
     return FavoriteModel(
-      id: map['id'],
-      title: map['title'],
-      image: map['image'],
-      price: map['price'],
+      id: (map['id'] ?? '').toString(),
+      title: (map['title'] ?? '').toString(),
+      image: (map['image'] ?? '').toString(),
+      price: (map['price'] is num)
+          ? (map['price'] as num).toDouble()
+          : double.tryParse(map['price'].toString()) ?? 0.0,
     );
   }
+
+  FavoriteModel copyWith({
+    String? id,
+    String? title,
+    String? image,
+    double? price,
+  }) {
+    return FavoriteModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      image: image ?? this.image,
+      price: price ?? this.price,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'FavoriteModel(id: $id, title: $title, image: $image, price: $price)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is FavoriteModel &&
+            other.id == id &&
+            other.title == title &&
+            other.image == image &&
+            other.price == price;
+  }
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ title.hashCode ^ image.hashCode ^ price.hashCode;
 }

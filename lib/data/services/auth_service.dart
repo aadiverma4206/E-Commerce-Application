@@ -2,8 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+
+  AuthService({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+  })  : _auth = auth ?? FirebaseAuth.instance,
+        _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<User?> register(String name, String email, String password) async {
     try {
@@ -25,14 +31,7 @@ class AuthService {
       });
 
       return user;
-    } on FirebaseAuthException catch (e) {
-      print("AUTH ERROR: ${e.code} - ${e.message}");
-      return null;
-    } on FirebaseException catch (e) {
-      print("FIRESTORE ERROR: ${e.code} - ${e.message}");
-      return null;
-    } catch (e) {
-      print("UNKNOWN ERROR: $e");
+    } catch (_) {
       return null;
     }
   }
@@ -45,12 +44,16 @@ class AuthService {
       );
 
       return result.user;
-    } on FirebaseAuthException catch (e) {
-      print("LOGIN ERROR: ${e.code} - ${e.message}");
-      return null;
-    } catch (e) {
-      print("UNKNOWN LOGIN ERROR: $e");
+    } catch (_) {
       return null;
     }
   }
+
+  Future<void> logout() async {
+    await _auth.signOut();
+  }
+
+  User? get currentUser => _auth.currentUser;
+
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 }

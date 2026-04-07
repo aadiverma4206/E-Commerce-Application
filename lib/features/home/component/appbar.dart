@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
 
-class Appbar extends StatefulWidget implements PreferredSizeWidget {
-  Appbar({Key? key})
-      : preferredSize = const Size.fromHeight(70),
-        super(key: key);
+class Appbar extends StatelessWidget implements PreferredSizeWidget {
+  const Appbar({super.key});
 
   @override
-  final Size preferredSize;
+  Size get preferredSize => const Size.fromHeight(70);
 
-  @override
-  State<Appbar> createState() => _AppbarState();
-}
-
-class _AppbarState extends State<Appbar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -20,11 +13,13 @@ class _AppbarState extends State<Appbar> {
         "🛍️ E-Commerce",
         style: TextStyle(
           fontWeight: FontWeight.bold,
+          fontSize: 20,
         ),
       ),
       centerTitle: true,
       backgroundColor: Colors.transparent,
       elevation: 0,
+      scrolledUnderElevation: 0,
     );
   }
 }

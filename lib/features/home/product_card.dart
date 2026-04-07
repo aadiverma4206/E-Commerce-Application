@@ -13,11 +13,7 @@ class ProductCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(
-          context,
-          "/product",
-          arguments: product,
-        );
+        Navigator.pushNamed(context, "/product", arguments: product);
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
@@ -25,20 +21,18 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
             colors: [
-              Colors.white.withOpacity(0.35),
-              Colors.white.withOpacity(0.1),
+              Colors.white.withOpacity(0.25),
+              Colors.white.withOpacity(0.08),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.25),
-              blurRadius: 14,
-              offset: const Offset(0, 8),
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
-          border: Border.all(color: Colors.white.withOpacity(0.25)),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
         ),
         child: Row(
           children: [
@@ -50,16 +44,14 @@ class ProductCard extends StatelessWidget {
               child: Stack(
                 children: [
                   CachedNetworkImage(
-                    imageUrl: "${product.imageUrl}?v=${product.id}",
-                    cacheKey: product.imageUrl + product.id,
+                    imageUrl: product.imageUrl,
                     width: size.width * 0.3,
                     height: size.width * 0.3,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
+                    placeholder: (context, url) => SizedBox(
                       width: size.width * 0.3,
                       height: size.width * 0.3,
-                      alignment: Alignment.center,
-                      child: const CircularProgressIndicator(),
+                      child: const Center(child: CircularProgressIndicator()),
                     ),
                     errorWidget: (context, url, error) => Container(
                       width: size.width * 0.3,
@@ -89,8 +81,10 @@ class ProductCard extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 10,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -99,7 +93,7 @@ class ProductCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: Colors.black87,
                       ),
@@ -118,7 +112,9 @@ class ProductCard extends StatelessWidget {
                         const SizedBox(width: 10),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.green.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(6),
@@ -146,96 +142,18 @@ class ProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Row(
-                      children: [
-                        const Icon(Icons.star,
-                            size: 16, color: Colors.orange),
-                        const SizedBox(width: 4),
-                        const Text("4.5",
-                            style: TextStyle(fontSize: 12)),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.star,
-                            size: 16, color: Colors.orange),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.star,
-                            size: 16, color: Colors.orange),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.star,
-                            size: 16, color: Colors.orange),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.star_half,
-                            size: 16, color: Colors.orange),
-                        const Spacer(),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Colors.deepPurple,
-                                Colors.purpleAccent,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            "Fast Delivery",
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            "Best Seller",
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.orange,
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            "-20%",
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                      children: const [
+                        Icon(Icons.star, size: 16, color: Colors.orange),
+                        SizedBox(width: 4),
+                        Text("4.5", style: TextStyle(fontSize: 12)),
+                        SizedBox(width: 6),
+                        Icon(Icons.star, size: 16, color: Colors.orange),
+                        SizedBox(width: 6),
+                        Icon(Icons.star, size: 16, color: Colors.orange),
+                        SizedBox(width: 6),
+                        Icon(Icons.star, size: 16, color: Colors.orange),
+                        SizedBox(width: 6),
+                        Icon(Icons.star_half, size: 16, color: Colors.orange),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -248,10 +166,7 @@ class ProductCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     const Text(
                       "Selling fast",
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 10, color: Colors.grey),
                     ),
                   ],
                 ),

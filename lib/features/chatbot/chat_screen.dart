@@ -12,12 +12,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController controller = TextEditingController();
   final ScrollController scrollController = ScrollController();
-  bool isFocused = false;
+  final FocusNode focusNode = FocusNode();
 
   @override
   void dispose() {
     controller.dispose();
     scrollController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -33,7 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<ChatViewModel>(context);
+    final vm = context.watch<ChatViewModel>();
     final size = MediaQuery.of(context).size;
 
     WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
@@ -41,10 +42,13 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Chat With AI", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Chat With AI",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        elevation: 30,
+        elevation: 0,
       ),
       body: Container(
         width: double.infinity,
@@ -59,41 +63,46 @@ class _ChatScreenState extends State<ChatScreen> {
         child: SafeArea(
           child: Column(
             children: [
-
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   itemCount: vm.messages.length,
                   itemBuilder: (context, index) {
                     final msg = vm.messages[index];
 
                     return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 250),
                       margin: const EdgeInsets.symmetric(vertical: 6),
                       child: Align(
                         alignment: msg.isUser
                             ? Alignment.centerRight
                             : Alignment.centerLeft,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
                           constraints: BoxConstraints(
                             maxWidth: size.width * 0.75,
                           ),
                           decoration: BoxDecoration(
                             gradient: msg.isUser
                                 ? const LinearGradient(
-                              colors: [
-                                Colors.deepPurple,
-                                Colors.purpleAccent
-                              ],
-                            )
+                                    colors: [
+                                      Colors.deepPurple,
+                                      Colors.purpleAccent,
+                                    ],
+                                  )
                                 : LinearGradient(
-                              colors: [
-                                Colors.white.withOpacity(0.9),
-                                Colors.white.withOpacity(0.7)
-                              ],
-                            ),
+                                    colors: [
+                                      Colors.white.withOpacity(0.95),
+                                      Colors.white.withOpacity(0.8),
+                                    ],
+                                  ),
                             borderRadius: BorderRadius.only(
                               topLeft: const Radius.circular(16),
                               topRight: const Radius.circular(16),
@@ -102,10 +111,10 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 6,
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 8,
                                 offset: const Offset(0, 3),
-                              )
+                              ),
                             ],
                           ),
                           child: Column(
@@ -114,20 +123,22 @@ class _ChatScreenState extends State<ChatScreen> {
                               Text(
                                 msg.message,
                                 style: TextStyle(
-                                  color: msg.isUser ? Colors.white : Colors.black87,
+                                  color: msg.isUser
+                                      ? Colors.white
+                                      : Colors.black87,
                                   fontSize: 15,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "${msg.time.hour}:${msg.time.minute.toString().padLeft(2, '0')}",
+                                "${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}",
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: msg.isUser
                                       ? Colors.white70
                                       : Colors.black54,
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -136,43 +147,42 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                 ),
               ),
-
               if (vm.isTyping)
-                Container(
-                  margin: const EdgeInsets.only(left: 12, bottom: 6),
-                  alignment: Alignment.centerLeft,
+                Padding(
+                  padding: const EdgeInsets.only(left: 12, bottom: 6),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text("Typing..."),
-                      )
+                      ),
                     ],
                   ),
                 ),
-
               AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withOpacity(0.97),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withOpacity(0.08),
                       blurRadius: 10,
-                    )
+                    ),
                   ],
                 ),
                 child: Row(
                   children: [
-
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
@@ -181,19 +191,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         child: TextField(
                           controller: controller,
-                          onTap: () {
-                            setState(() => isFocused = true);
-                          },
-                          onChanged: (_) {
-                            setState(() {
-
-                            });
-                          },
-                          onSubmitted: (_) {
-                            if (controller.text.trim().isEmpty) return;
-                            vm.sendMessage(controller.text);
-                            controller.clear();
-                          },
+                          focusNode: focusNode,
+                          textInputAction: TextInputAction.send,
+                          onSubmitted: (_) => _send(vm),
                           decoration: const InputDecoration(
                             hintText: "Type a message...",
                             border: InputBorder.none,
@@ -205,31 +205,16 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 8),
-
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
+                    Container(
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [
-                            Colors.deepPurple,
-                            Colors.purpleAccent,
-                          ],
+                          colors: [Colors.deepPurple, Colors.purpleAccent],
                         ),
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: IconButton(
-                        onPressed: () {
-                          if (controller.text.trim().isEmpty) return;
-
-                          vm.sendMessage(controller.text);
-                          controller.clear();
-
-                          Future.delayed(const Duration(milliseconds: 200), () {
-                            scrollToBottom();
-                          });
-                        },
+                        onPressed: () => _send(vm),
                         icon: const Icon(Icons.send, color: Colors.white),
                       ),
                     ),
@@ -241,5 +226,13 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  void _send(ChatViewModel vm) {
+    final text = controller.text.trim();
+    if (text.isEmpty) return;
+    vm.sendMessage(text);
+    controller.clear();
+    Future.delayed(const Duration(milliseconds: 200), scrollToBottom);
   }
 }

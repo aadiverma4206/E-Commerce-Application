@@ -2,27 +2,22 @@ import 'package:flutter/material.dart';
 
 class Helpers {
   static void showSnackBar(
-      BuildContext context,
-      String message, {
-        SnackType type = SnackType.success,
-      }) {
+    BuildContext context,
+    String message, {
+    SnackType type = SnackType.success,
+  }) {
     final Color bgColor = _getBackgroundColor(type);
     final IconData icon = _getIcon(type);
+    final size = MediaQuery.of(context).size;
 
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,
       backgroundColor: Colors.transparent,
       elevation: 0,
       duration: const Duration(seconds: 2),
-      margin: EdgeInsets.symmetric(
-        horizontal: MediaQuery.of(context).size.width * 0.05,
-        vertical: 16,
-      ),
+      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05, vertical: 16),
       content: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(14),
@@ -31,18 +26,20 @@ class Helpers {
               color: Colors.black.withOpacity(0.15),
               blurRadius: 10,
               offset: const Offset(0, 4),
-            )
+            ),
           ],
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white, size: 26),
+            Icon(icon, color: Colors.white, size: 24),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width * 0.038,
+                  fontSize: size.width * 0.038,
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -53,7 +50,10 @@ class Helpers {
       ),
     );
 
-    ScaffoldMessenger.of(context)
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+
+    messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(snackBar);
   }

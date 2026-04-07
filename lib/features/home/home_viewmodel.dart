@@ -3,9 +3,12 @@ import '../../data/models/product_model.dart';
 import '../../data/services/product_service.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  final ProductService _productService = ProductService();
+  final ProductService _productService;
 
-  Stream<List<ProductModel>> getProducts() {
+  HomeViewModel({ProductService? productService})
+      : _productService = productService ?? ProductService();
+
+  Stream<List<ProductModel>> get productsStream {
     return _productService.getProducts();
   }
 }

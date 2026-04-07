@@ -5,7 +5,7 @@ class ProductModel {
   final String imageUrl;
   final String description;
 
-  ProductModel({
+  const ProductModel({
     required this.id,
     required this.name,
     required this.price,
@@ -13,7 +13,6 @@ class ProductModel {
     required this.description,
   });
 
-  // 🔥 ADD THIS (IMPORTANT)
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -23,14 +22,55 @@ class ProductModel {
     };
   }
 
-  // 🔥 OPTIONAL (good practice)
   factory ProductModel.fromMap(Map<String, dynamic> map, String id) {
     return ProductModel(
       id: id,
-      name: map['name'] ?? '',
-      price: (map['price'] ?? 0).toDouble(),
-      imageUrl: map['imageUrl'] ?? '',
-      description: map['description'] ?? '',
+      name: (map['name'] ?? '').toString(),
+      price: (map['price'] is num)
+          ? (map['price'] as num).toDouble()
+          : double.tryParse(map['price'].toString()) ?? 0.0,
+      imageUrl: (map['imageUrl'] ?? '').toString(),
+      description: (map['description'] ?? '').toString(),
     );
   }
+
+  ProductModel copyWith({
+    String? id,
+    String? name,
+    double? price,
+    String? imageUrl,
+    String? description,
+  }) {
+    return ProductModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      imageUrl: imageUrl ?? this.imageUrl,
+      description: description ?? this.description,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'ProductModel(id: $id, name: $name, price: $price, imageUrl: $imageUrl, description: $description)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is ProductModel &&
+            other.id == id &&
+            other.name == name &&
+            other.price == price &&
+            other.imageUrl == imageUrl &&
+            other.description == description;
+  }
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      price.hashCode ^
+      imageUrl.hashCode ^
+      description.hashCode;
 }

@@ -5,8 +5,7 @@ import 'chat_service.dart';
 class ChatViewModel extends ChangeNotifier {
   final ChatService _service;
 
-  ChatViewModel({ChatService? service})
-      : _service = service ?? ChatService();
+  ChatViewModel({ChatService? service}) : _service = service ?? ChatService();
 
   final List<ChatModel> _messages = [];
   bool _isTyping = false;
@@ -19,13 +18,10 @@ class ChatViewModel extends ChangeNotifier {
     if (message.isEmpty) return;
 
     _messages.add(
-      ChatModel(
-        message: message,
-        isUser: true,
-        time: DateTime.now(),
-      ),
+      ChatModel(message: message, isUser: true, time: DateTime.now()),
     );
 
+    notifyListeners();
     _setTyping(true);
 
     try {
@@ -33,15 +29,15 @@ class ChatViewModel extends ChangeNotifier {
 
       _messages.add(
         ChatModel(
-          message: reply.isEmpty ? "No response from AI" : reply,
+          message: reply.trim().isEmpty ? "No response received" : reply.trim(),
           isUser: false,
           time: DateTime.now(),
         ),
       );
-    } catch (e) {
+    } catch (_) {
       _messages.add(
         ChatModel(
-          message: "Error: ${e.toString()}",
+          message: "Something went wrong. Please try again.",
           isUser: false,
           time: DateTime.now(),
         ),
@@ -57,6 +53,7 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   void _setTyping(bool value) {
+    if (_isTyping == value) return;
     _isTyping = value;
     notifyListeners();
   }

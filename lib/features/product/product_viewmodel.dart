@@ -4,29 +4,43 @@ import '../../data/services/product_service.dart';
 import '../../core/utils/notification_service.dart';
 
 class ProductViewModel extends ChangeNotifier {
-  final ProductService _service = ProductService();
+  final ProductService _service;
 
-  bool isLoading = false;
-  String? error;
+  ProductViewModel({ProductService? service})
+    : _service = service ?? ProductService();
+
+  bool _isLoading = false;
+  String? _error;
+
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
   Future<void> upload(ProductModel product) async {
-    isLoading = true;
-    error = null;
-    notifyListeners();
+    _setLoading(true);
+    _setError(null);
 
     try {
       await _service.uploadProduct(product);
 
       await NotificationService.showNotification(
-        "🛍️New Product🛍️",
-        "${product.name} 🛍️Show Now ",
+        "🛍️ New Product",
+        "${product.name} is now available",
       );
-    } catch (e) {
-      error = e.toString();
-      debugPrint("UPLOAD ERROR: $e");
+    } catch (_) {
+      _setError("Failed to upload product");
     } finally {
-      isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
+  }
+
+  void _setLoading(bool value) {
+    if (_isLoading == value) return;
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void _setError(String? message) {
+    _error = message;
+    notifyListeners();
   }
 }

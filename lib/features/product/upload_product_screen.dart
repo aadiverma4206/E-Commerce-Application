@@ -16,85 +16,196 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
   final priceController = TextEditingController();
   final imageController = TextEditingController();
 
-  bool isLoading = false;
+  final FocusNode nameFocus = FocusNode();
+  final FocusNode descFocus = FocusNode();
+  final FocusNode priceFocus = FocusNode();
+  final FocusNode imageFocus = FocusNode();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    descController.dispose();
+    priceController.dispose();
+    imageController.dispose();
+    nameFocus.dispose();
+    descFocus.dispose();
+    priceFocus.dispose();
+    imageFocus.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<ProductViewModel>(context);
+    final vm = context.watch<ProductViewModel>();
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text("Upload Product"),
+        title: const Text(
+          "Upload Product",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-
-            _field(nameController, "Product Name"),
-            const SizedBox(height: 12),
-
-            _field(descController, "Description"),
-            const SizedBox(height: 12),
-
-            _field(priceController, "Price", isNumber: true),
-            const SizedBox(height: 12),
-
-            _field(imageController, "Image URL"),
-            const SizedBox(height: 20),
-
-            isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-              onPressed: () async {
-                if (nameController.text.isEmpty ||
-                    priceController.text.isEmpty ||
-                    imageController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("All fields required")),
-                  );
-                  return;
-                }
-
-                setState(() => isLoading = true);
-
-                final product = ProductModel(
-                  id: "",
-                  name: nameController.text.trim(),
-                  description: descController.text.trim(),
-                  price: double.tryParse(priceController.text) ?? 0,
-                  imageUrl: imageController.text.trim(),
-                );
-
-                await vm.upload(product);
-
-                setState(() => isLoading = false);
-
-                Navigator.pop(context);
-              },
-              child: const Text("Upload"),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF6C63FF), Color(0xFF00C9A7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
+          ),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: Card(
+                    elevation: 12,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          _field(
+                            controller: nameController,
+                            hint: "Product Name",
+                            focusNode: nameFocus,
+                            textInputAction: TextInputAction.next,
+                            onSubmitted: (_) => descFocus.requestFocus(),
+                          ),
+                          const SizedBox(height: 12),
+                          _field(
+                            controller: descController,
+                            hint: "Description",
+                            focusNode: descFocus,
+                            textInputAction: TextInputAction.next,
+                            onSubmitted: (_) => priceFocus.requestFocus(),
+                          ),
+                          const SizedBox(height: 12),
+                          _field(
+                            controller: priceController,
+                            hint: "Price",
+                            focusNode: priceFocus,
+                            isNumber: true,
+                            textInputAction: TextInputAction.next,
+                            onSubmitted: (_) => imageFocus.requestFocus(),
+                          ),
+                          const SizedBox(height: 12),
+                          _field(
+                            controller: imageController,
+                            hint: "Image URL",
+                            focusNode: imageFocus,
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (_) => _handleUpload(),
+                          ),
+                          const SizedBox(height: 20),
+                          vm.isLoading
+                              ? const CircularProgressIndicator()
+                              : SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _handleUpload,
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      backgroundColor: Colors.black,
+                                    ),
+                                    child: const Text(
+                                      "Upload Product",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  // 🔥 Modern TextField
-  Widget _field(TextEditingController controller, String hint,
-      {bool isNumber = false}) {
-    return TextField(
-      controller: controller,
-      keyboardType:
-      isNumber ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+  Future<void> _handleUpload() async {
+    final vm = context.read<ProductViewModel>();
+
+    final name = nameController.text.trim();
+    final desc = descController.text.trim();
+    final price = double.tryParse(priceController.text.trim());
+    final image = imageController.text.trim();
+
+    if (name.isEmpty || desc.isEmpty || price == null || image.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("All fields are required")));
+      return;
+    }
+
+    final product = ProductModel(
+      id: "",
+      name: name,
+      description: desc,
+      price: price,
+      imageUrl: image,
+    );
+
+    await vm.upload(product);
+
+    if (!mounted) return;
+
+    if (vm.error == null) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(vm.error!)));
+    }
+  }
+
+  Widget _field({
+    required TextEditingController controller,
+    required String hint,
+    required FocusNode focusNode,
+    required TextInputAction textInputAction,
+    required Function(String) onSubmitted,
+    bool isNumber = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        textInputAction: textInputAction,
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        onSubmitted: onSubmitted,
+        decoration: InputDecoration(
+          hintText: hint,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
         ),
       ),
     );

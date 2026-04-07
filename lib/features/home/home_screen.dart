@@ -18,23 +18,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<HomeViewModel>(context);
+    final vm = context.watch<HomeViewModel>();
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      drawer: const Drawer1(),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Colors.deepPurple,
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ChatScreen()),
+            MaterialPageRoute(builder: (_) => const ChatScreen()),
           );
         },
         label: const Text("Chat", style: TextStyle(fontSize: 16)),
         icon: const Icon(Icons.message_outlined),
       ),
-      drawer: Drawer1(),
       appBar: AppBar(
         title: const Text(
           "🛍️ E-Commerce",
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        elevation: 500,
+        elevation: 0,
       ),
       body: Container(
         width: double.infinity,
@@ -81,10 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-
               Expanded(
                 child: StreamBuilder<List<ProductModel>>(
-                  stream: vm.getProducts(),
+                  stream: vm.productsStream,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -95,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (snapshot.hasError) {
                       return const Center(
                         child: Text(
-                          "Error",
+                          "Something went wrong",
                           style: TextStyle(color: Colors.white),
                         ),
                       );
@@ -103,13 +102,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     final products = snapshot.data ?? [];
 
-                    final filtered = products
-                        .where(
-                          (p) => p.name.toLowerCase().contains(
-                            searchQuery.toLowerCase(),
-                          ),
-                        )
-                        .toList();
+                    final filtered = products.where((p) {
+                      final name = p.name.toLowerCase();
+                      return name.contains(searchQuery.toLowerCase());
+                    }).toList();
+
+                    if (filtered.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No products found",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }
 
                     return GridView.builder(
                       padding: const EdgeInsets.all(12),
@@ -136,13 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(20),
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.white.withOpacity(0.3),
-                                  Colors.white.withOpacity(0.1),
+                                  Colors.white.withOpacity(0.25),
+                                  Colors.white.withOpacity(0.08),
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withOpacity(0.15),
                                   blurRadius: 10,
                                 ),
                               ],
@@ -156,9 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       top: Radius.circular(20),
                                     ),
                                     child: CachedNetworkImage(
-                                      imageUrl:
-                                          "${product.imageUrl}?v=${product.id}",
-                                      cacheKey: product.imageUrl + product.id,
+                                      imageUrl: product.imageUrl,
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       placeholder: (context, url) =>
@@ -170,7 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                 ),
-
                                 Padding(
                                   padding: const EdgeInsets.all(10),
                                   child: Column(
@@ -186,9 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-
                                       const SizedBox(height: 4),
-
                                       Text(
                                         "₹${product.price}",
                                         style: const TextStyle(
@@ -196,9 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-
                                       const SizedBox(height: 4),
-
                                       Text(
                                         product.description,
                                         maxLines: 2,

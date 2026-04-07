@@ -18,39 +18,62 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
+    return openDatabase(path, version: 1, onCreate: _createDB);
   }
 
-  Future _createDB(Database db, int version) async {
+  Future<void> _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE favorites (
         id TEXT PRIMARY KEY,
-        title TEXT,
+        title TEXT NOT NULL,
         image TEXT,
-        price REAL
+        price REAL NOT NULL
       )
     ''');
   }
 
   Future<void> insertFavorite(FavoriteModel fav) async {
-    final db = await instance.database;
-    await db.insert('favorites', fav.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    final db = await database;
+    await db.insert(
+      'favorites',
+      fav.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<FavoriteModel>> getFavorites() async {
-    final db = await instance.database;
+    final db = await database;
     final result = await db.query('favorites');
 
     return result.map((e) => FavoriteModel.fromMap(e)).toList();
   }
 
   Future<void> deleteFavorite(String id) async {
-    final db = await instance.database;
+    final db = await database;
     await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<bool> isFavorite(String id) async {
+    final db = await database;
+    final result = await db.query(
+      'favorites',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    return result.isNotEmpty;
+  }
+
+  Future<void> clearFavorites() async {
+    final db = await database;
+    await db.delete('favorites');
+  }
+
+  Future close() async {
+    final db = _database;
+    if (db != null) {
+      await db.close();
+      _database = null;
+    }
   }
 }

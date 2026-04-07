@@ -1,36 +1,36 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'dart:async';
 
 class ApiClient {
-  static const String apiKey = "AIzaSyDoJl0sZ9cg8gIwSgtLVKaSmMMrSSyajVQ";
+  final GenerativeModel _model;
 
-  late final GenerativeModel _model;
-
-  ApiClient() {
-    _model = GenerativeModel(
-      model: 'gemini-1.5-flash',
-      apiKey: apiKey,
-    );
-  }
+  ApiClient({required String apiKey})
+      : _model = GenerativeModel(
+    model: 'gemini-1.5-flash',
+    apiKey: apiKey,
+  );
 
   Future<String> sendMessage(String message) async {
     if (message.trim().isEmpty) {
-      return "Message cannot be empty";
+      return "Please enter a message";
     }
 
     try {
-      final response = await _model.generateContent(
-        [Content.text(message)],
-      );
+      final response = await _model
+          .generateContent([Content.text(message)])
+          .timeout(const Duration(seconds: 10));
 
       final text = response.text;
 
-      if (text == null || text.isEmpty) {
-        return "No response from AI";
+      if (text == null || text.trim().isEmpty) {
+        return "No response received. Try again.";
       }
 
-      return text;
+      return text.trim();
+    } on TimeoutException {
+      return "Request timed out. Check your internet.";
     } catch (e) {
-      return "Error: ${e.toString()}";
+      return "Something went wrong. Please try again.";
     }
   }
 }

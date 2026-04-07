@@ -1,9 +1,7 @@
 import 'package:e_commerce_application/features/favorites/favorites_screen.dart';
 import 'package:e_commerce_application/features/home/DrawerPages/version/anim_text_version.dart';
-import 'package:e_commerce_application/features/product/product_detail_screen.dart';
 import 'package:e_commerce_application/features/product/upload_product_screen.dart';
 import 'package:flutter/material.dart';
-
 import '../DrawerPages/pages/developer.dart';
 
 class Drawer1 extends StatelessWidget {
@@ -25,7 +23,6 @@ class Drawer1 extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              // 🔥 HEADER
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(
@@ -34,15 +31,14 @@ class Drawer1 extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                       radius: 35,
-                      backgroundImage:
-                      AssetImage('assets/images/logo.png'),
+                      backgroundImage: AssetImage('assets/images/logo.png'),
                     ),
                     const SizedBox(width: 15),
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'E-Commerce',
                           style: TextStyle(
@@ -54,20 +50,14 @@ class Drawer1 extends StatelessWidget {
                         SizedBox(height: 4),
                         Text(
                           'help@gmail.com',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.white70),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
-
               const Divider(color: Colors.white30),
-
-              // 🔥 MENU ITEMS
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.all(10),
@@ -80,7 +70,6 @@ class Drawer1 extends StatelessWidget {
                         Navigator.pop(context);
                       },
                     ),
-
                     _buildTile(
                       context,
                       icon: Icons.upload,
@@ -90,11 +79,11 @@ class Drawer1 extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => UploadProductScreen()),
+                            builder: (_) => const UploadProductScreen(),
+                          ),
                         );
                       },
                     ),
-
                     _buildTile(
                       context,
                       icon: Icons.favorite,
@@ -104,25 +93,11 @@ class Drawer1 extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => FavoritesScreen()),
+                            builder: (_) => const FavoritesScreen(),
+                          ),
                         );
                       },
                     ),
-
-                    _buildTile(
-                      context,
-                      icon: Icons.shopping_bag,
-                      title: "Products",
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => ProductDetailScreen()),
-                        );
-                      },
-                    ),
-
                     _buildTile(
                       context,
                       icon: Icons.code,
@@ -132,7 +107,22 @@ class Drawer1 extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => DeveloperAadi()),
+                            builder: (_) => const DeveloperAadi(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildTile(
+                      context,
+                      icon: Icons.info_outline,
+                      title: "Version",
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AnimTextVersion(),
+                          ),
                         );
                       },
                     ),
@@ -140,27 +130,6 @@ class Drawer1 extends StatelessWidget {
                 ),
               ),
               const Divider(color: Colors.white30),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(10),
-                  children: [
-                    _buildTile(
-                      context,
-                      icon: Icons.upload,
-                      title: "Version",
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => AnimTextVersion()),
-                        );
-                      },
-                    ),
-
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -168,11 +137,12 @@ class Drawer1 extends StatelessWidget {
     );
   }
 
-  // 🔥 MODERN TILE
-  Widget _buildTile(BuildContext context,
-      {required IconData icon,
-        required String title,
-        required VoidCallback onTap}) {
+  Widget _buildTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: InkWell(
@@ -198,8 +168,11 @@ class Drawer1 extends StatelessWidget {
                   ),
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios,
-                  size: 14, color: Colors.white70)
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: Colors.white70,
+              ),
             ],
           ),
         ),
